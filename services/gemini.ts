@@ -1,24 +1,34 @@
 
-import { GoogleGenAI, Type, GenerateContentResponse, Modality, LiveServerMessage } from "@google/genai";
+import { GoogleGenAI, Modality, LiveServerMessage } from "@google/genai";
 
 /**
- * Initialise une nouvelle instance du SDK à chaque appel pour garantir
- * l'utilisation de la clé API la plus récente.
- * Ajout d'une vérification sécurisée pour éviter le plantage si 'process' est indéfini.
+ * Initialise une nouvelle instance du SDK de manière sécurisée.
  */
 const getAI = () => {
-  const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) || '';
+  // Accès sécurisé à la clé API (soit via l'injection plateforme, soit via le polyfill window)
+  const env = (typeof process !== 'undefined' ? process.env : (window as any).process?.env) || {};
+  const apiKey = env.API_KEY || '';
+  
+  if (!apiKey) {
+    console.warn("Clé API Gemini manquante. Certaines fonctionnalités IA seront limitées.");
+  }
+  
   return new GoogleGenAI({ apiKey });
 };
 
 export function decodeBase64(base64: string) {
-  const binaryString = atob(base64);
-  const len = binaryString.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) {
-    bytes[i] = binaryString.charCodeAt(i);
+  try {
+    const binaryString = atob(base64);
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return bytes;
+  } catch (e) {
+    console.error("Erreur de décodage audio base64", e);
+    return new Uint8Array(0);
   }
-  return bytes;
 }
 
 export function encodeBase64(bytes: Uint8Array) {
@@ -78,11 +88,11 @@ export async function getCityInsights(city: string, country: string) {
       config: { tools: [{ googleSearch: {} }] },
     });
     return {
-      text: response.text,
+      text: response.text || "Informations indisponibles.",
       sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
     };
   } catch (error) {
-    return { text: "Infos indisponibles.", sources: [] };
+    return { text: "Service de recherche indisponible.", sources: [] };
   }
 }
 
@@ -95,7 +105,7 @@ export async function getNearbyAmenities(city: string) {
       config: { tools: [{ googleMaps: {} }] },
     });
     return {
-      text: response.text,
+      text: response.text || "Données cartographiques indisponibles.",
       sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
     };
   } catch (error) {
@@ -126,6 +136,7 @@ export async function generateDreamHome(prompt: string, aspectRatio: string = "1
     }
     return null;
   } catch (err) {
+    console.error("Erreur de génération d'image", err);
     throw err;
   }
 }
@@ -166,6 +177,6 @@ export async function analyzePropertyImage(base64Image: string) {
         ]
       }
     });
-    return response.text;
+    return response.text || "Analyse indisponible.";
   } catch (err) { return "Erreur d'analyse."; }
 }
