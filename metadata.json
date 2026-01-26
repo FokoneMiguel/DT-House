@@ -1,0 +1,8 @@
+{
+  "name": "ImmoDirect - Housing Marketplace",
+  "description": "A high-fidelity mobile-first real estate marketplace with AI-powered search, image generation, and property analysis.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
