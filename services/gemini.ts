@@ -1,12 +1,12 @@
 
 import { GoogleGenAI, Type, GenerateContentResponse, Modality, LiveServerMessage } from "@google/genai";
 
-// Initialize AI client only when needed
+/**
+ * Initialise une nouvelle instance du SDK à chaque appel pour garantir
+ * l'utilisation de la clé API la plus récente (notamment après une sélection manuelle).
+ */
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
-/**
- * Audio Utility: Decode Base64 string to Uint8Array
- */
 export function decodeBase64(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -17,9 +17,6 @@ export function decodeBase64(base64: string) {
   return bytes;
 }
 
-/**
- * Audio Utility: Encode Uint8Array to Base64 string
- */
 export function encodeBase64(bytes: Uint8Array) {
   let binary = '';
   const len = bytes.byteLength;
@@ -29,9 +26,6 @@ export function encodeBase64(bytes: Uint8Array) {
   return btoa(binary);
 }
 
-/**
- * Audio Utility: Decode raw PCM to AudioBuffer
- */
 export async function decodeAudioData(
   data: Uint8Array,
   ctx: AudioContext,
@@ -51,9 +45,6 @@ export async function decodeAudioData(
   return buffer;
 }
 
-/**
- * Gemini Live API: Connect to a real-time voice session
- */
 export function connectConcierge(callbacks: {
   onopen: () => void;
   onmessage: (message: LiveServerMessage) => void;
@@ -74,9 +65,6 @@ export function connectConcierge(callbacks: {
   });
 }
 
-/**
- * Gemini 3 Search Grounding for city insights
- */
 export async function getCityInsights(city: string, country: string) {
   const ai = getAI();
   try {
@@ -94,9 +82,6 @@ export async function getCityInsights(city: string, country: string) {
   }
 }
 
-/**
- * Gemini 2.5 Maps Grounding
- */
 export async function getNearbyAmenities(city: string) {
   const ai = getAI();
   try {
@@ -114,10 +99,6 @@ export async function getNearbyAmenities(city: string) {
   }
 }
 
-/**
- * Updated signature to accept aspectRatio and imageSize as required by AIEnhanceView.
- * Also updated to iterate over parts to find the image as per Gemini API guidelines.
- */
 export async function generateDreamHome(prompt: string, aspectRatio: string = "16:9", imageSize: string = "1K") {
   const ai = getAI();
   try {
@@ -132,22 +113,19 @@ export async function generateDreamHome(prompt: string, aspectRatio: string = "1
       }
     });
     
-    // Correctly extract image from response candidates as per guidelines
     if (response.candidates && response.candidates.length > 0) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
-          const base64EncodeString: string = part.inlineData.data;
-          return `data:image/png;base64,${base64EncodeString}`;
+          return `data:image/png;base64,${part.inlineData.data}`;
         }
       }
     }
     return null;
-  } catch (err) { throw err; }
+  } catch (err) {
+    throw err;
+  }
 }
 
-/**
- * Edit property image following guidelines for iterating through parts.
- */
 export async function editPropertyImage(base64Image: string, editPrompt: string) {
   const ai = getAI();
   try {
@@ -164,8 +142,7 @@ export async function editPropertyImage(base64Image: string, editPrompt: string)
     if (response.candidates && response.candidates.length > 0) {
       for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
-          const base64EncodeString: string = part.inlineData.data;
-          return `data:image/png;base64,${base64EncodeString}`;
+          return `data:image/png;base64,${part.inlineData.data}`;
         }
       }
     }
@@ -181,7 +158,7 @@ export async function analyzePropertyImage(base64Image: string) {
       contents: {
         parts: [
           { inlineData: { data: base64Image.split(',')[1], mimeType: 'image/png' } },
-          { text: "Décris brièvement ce logement." }
+          { text: "Décris brièvement ce logement pour une annonce immobilière." }
         ]
       }
     });
