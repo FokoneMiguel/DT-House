@@ -3,9 +3,13 @@ import { GoogleGenAI, Type, GenerateContentResponse, Modality, LiveServerMessage
 
 /**
  * Initialise une nouvelle instance du SDK à chaque appel pour garantir
- * l'utilisation de la clé API la plus récente (notamment après une sélection manuelle).
+ * l'utilisation de la clé API la plus récente.
+ * Ajout d'une vérification sécurisée pour éviter le plantage si 'process' est indéfini.
  */
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+const getAI = () => {
+  const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) || '';
+  return new GoogleGenAI({ apiKey });
+};
 
 export function decodeBase64(base64: string) {
   const binaryString = atob(base64);
