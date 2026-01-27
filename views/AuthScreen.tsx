@@ -1,90 +1,86 @@
 
 import React, { useState } from 'react';
-import { Mail, Lock, Apple, Smartphone } from 'lucide-react';
-import { User } from '../types';
+import { User, UserRole } from '../types';
+import { Building2, User as UserIcon, Check } from 'lucide-react';
 
 interface AuthScreenProps {
   onLogin: (user: User) => void;
 }
 
 const AuthScreen: React.FC<AuthScreenProps> = ({ onLogin }) => {
+  const [role, setRole] = useState<UserRole>(UserRole.TENANT);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login
     onLogin({
-      id: 'user_123',
-      name: 'Utilisateur Démo',
-      email: email || 'demo@immodirect.com',
-      phone: '+33 6 00 00 00 00',
-      avatar: 'https://picsum.photos/seed/user/100/100',
-      role: email.includes('admin') ? 'admin' : 'user'
+      id: 'u' + Date.now(),
+      name: email.split('@')[0] || 'Utilisateur HOUZ',
+      email: email || 'user@houz.cm',
+      role: role,
+      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email || 'default'}`,
+      balance: 0
     });
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white max-w-md mx-auto px-8 py-12">
-      <div className="mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Bienvenue 👋</h2>
-        <p className="text-gray-500">Connectez-vous pour commencer votre recherche.</p>
+    <div className="flex flex-col h-screen bg-white px-8 py-12 overflow-y-auto">
+      <div className="flex flex-col items-center mb-12">
+        <div className="w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-indigo-100 mb-6 transform rotate-3">
+          <span className="text-white text-4xl font-black italic">H</span>
+        </div>
+        <h1 className="text-4xl font-black text-indigo-900 tracking-tighter">HOUZ</h1>
+        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest mt-2">Cameroun Marketplace</p>
       </div>
 
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div className="relative">
-          <Mail className="absolute left-4 top-3.5 text-gray-400" size={20} />
-          <input 
-            type="email"
-            placeholder="Email"
-            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="relative">
-          <Lock className="absolute left-4 top-3.5 text-gray-400" size={20} />
-          <input 
-            type="password"
-            placeholder="Mot de passe"
-            className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div className="text-right">
-          <button type="button" className="text-sm font-semibold text-indigo-600">Mot de passe oublié ?</button>
-        </div>
+      <div className="mb-10">
+        <h2 className="text-2xl font-black text-gray-900 mb-2">Commençons !</h2>
+        <p className="text-gray-500 text-sm">Choisissez votre type de profil pour continuer.</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-8">
+        {[UserRole.TENANT, UserRole.OWNER].map((r) => (
+          <button
+            key={r}
+            onClick={() => setRole(r)}
+            className={`relative p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${
+              role === r 
+                ? 'border-indigo-600 bg-indigo-50 shadow-inner' 
+                : 'border-gray-100 bg-gray-50 text-gray-400'
+            }`}
+          >
+            {role === r && (
+              <div className="absolute top-2 right-2 bg-indigo-600 rounded-full p-1 text-white scale-75">
+                <Check size={16} />
+              </div>
+            )}
+            {r === UserRole.TENANT ? <UserIcon size={32} /> : <Building2 size={32} />}
+            <span className={`text-xs font-black uppercase ${role === r ? 'text-indigo-600' : ''}`}>
+              {r}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input 
+          type="email" 
+          placeholder="votre.email@domaine.cm"
+          required
+          className="w-full p-5 bg-gray-50 border-none rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:ring-4 focus:ring-indigo-100 transition-all"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
         <button 
           type="submit"
-          className="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-colors"
+          className="w-full bg-indigo-900 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:scale-[1.02] active:scale-95 transition-all"
         >
-          Se connecter
+          Continuer
         </button>
       </form>
-
-      <div className="relative my-10">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-100"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-400">Ou continuer avec</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <button className="flex items-center justify-center gap-2 py-3.5 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
-          <Smartphone size={20} className="text-gray-900" />
-          <span className="font-semibold text-gray-900">Google</span>
-        </button>
-        <button className="flex items-center justify-center gap-2 py-3.5 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
-          <Apple size={20} className="text-gray-900" />
-          <span className="font-semibold text-gray-900">Apple</span>
-        </button>
-      </div>
-
-      <p className="mt-auto text-center text-gray-500 text-sm">
-        Nouveau sur ImmoDirect ? <button className="text-indigo-600 font-bold">Créer un compte</button>
+      
+      <p className="mt-auto text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest py-8">
+        En continuant, vous acceptez nos CGU de HOUZ Cameroun
       </p>
     </div>
   );

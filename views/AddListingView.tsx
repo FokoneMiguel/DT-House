@@ -12,13 +12,14 @@ import {
   Camera
 } from 'lucide-react';
 import { analyzePropertyImage } from '../services/gemini';
-import { Property, PropertyType, Furnishing, StayDuration } from '../types';
+import { Property, PropertyType, Furnishing, StayDuration, User } from '../types';
 
 interface AddListingViewProps {
   onAdd: (property: Property) => void;
+  owner: User; // Added owner prop to resolve App.tsx error
 }
 
-const AddListingView: React.FC<AddListingViewProps> = ({ onAdd }) => {
+const AddListingView: React.FC<AddListingViewProps> = ({ onAdd, owner }) => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -69,6 +70,7 @@ const AddListingView: React.FC<AddListingViewProps> = ({ onAdd }) => {
 
     setIsSubmitting(true);
     
+    // Updated property creation to match interface requirements
     const newProperty: Property = {
       id: Date.now().toString(),
       title,
@@ -77,16 +79,19 @@ const AddListingView: React.FC<AddListingViewProps> = ({ onAdd }) => {
       currency: '€',
       city,
       country: 'France',
+      neighborhood: 'Centre',
       type: PropertyType.APPARTEMENT,
       furnishing: Furnishing.MEUBLE,
       duration: StayDuration.LONG,
       imageUrl: images[0],
       images: images,
+      ownerId: owner.id,
+      ownerName: owner.name,
       owner: {
-        name: 'Utilisateur Démo',
+        name: owner.name,
         phone: '+33 6 00 00 00 00',
-        email: 'demo@immodirect.com',
-        avatar: 'https://picsum.photos/seed/user/100/100'
+        email: owner.email,
+        avatar: owner.avatar
       }
     };
 

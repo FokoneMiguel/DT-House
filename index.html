@@ -4,15 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ImmoDirect - Location Immobilière</title>
-    <!-- Tailwind Play CDN (l'avertissement en console est normal en l'absence de build step) -->
+    <title>HOUZ - Location Immobilier Cameroun</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            animation: {
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            colors: {
+              indigo: {
+                900: '#1a1c3d',
+                600: '#4f46e5'
+              },
+              amber: {
+                500: '#f59e0b'
+              }
             }
           }
         }
@@ -20,33 +25,13 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script>
-      // Polyfill indispensable pour éviter "process is not defined" qui cause l'écran blanc
-      window.process = {
-        env: {
-          NODE_ENV: 'production',
-          API_KEY: '' // Sera injecté ou géré par l'app
-        }
-      };
+      window.process = { env: { NODE_ENV: 'production', API_KEY: '' } };
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
-        /* Masquer la barre de défilement sur mobile */
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        #root {
-            min-height: 100vh;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #ffffff; margin: 0; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        #root { min-height: 100vh; }
     </style>
 <script type="importmap">
 {
@@ -67,7 +52,6 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
     <div id="root"></div>
-    <!-- Point d'entrée CRITIQUE pour charger l'application React -->
     <script type="module" src="index.tsx"></script>
 </body>
 </html>

@@ -3,17 +3,56 @@ export enum PropertyType {
   CHAMBRE = 'Chambre',
   STUDIO = 'Studio',
   APPARTEMENT = 'Appartement',
-  MAISON = 'Maison'
+  MAISON = 'Maison',
+  VILLA = 'Villa'
 }
 
+// Fix missing enums needed for Property interface and AddListingView
 export enum Furnishing {
   MEUBLE = 'Meublé',
   NON_MEUBLE = 'Non meublé'
 }
 
 export enum StayDuration {
-  COURT = 'Court séjour',
+  SHORT = 'Court séjour',
   LONG = 'Long séjour'
+}
+
+export enum UserRole {
+  TENANT = 'Locataire',
+  OWNER = 'Propriétaire'
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  text: string;
+  timestamp: number;
+}
+
+export interface Chat {
+  id: string;
+  participants: string[];
+  propertyId: string;
+  lastMessage?: string;
+  messages: Message[];
+}
+
+export interface Transaction {
+  id: string;
+  propertyId: string;
+  amount: number;
+  commission: number;
+  status: 'pending' | 'completed';
+  date: number;
+}
+
+// New interface for owner details in property context
+export interface PropertyOwner {
+  name: string;
+  avatar: string;
+  phone?: string;
+  email?: string;
 }
 
 export interface Property {
@@ -23,36 +62,24 @@ export interface Property {
   price: number;
   currency: string;
   city: string;
-  country: string;
+  country: string; // Added missing field
+  neighborhood: string;
   type: PropertyType;
-  furnishing: Furnishing;
-  duration: StayDuration;
+  furnishing: string; // Added missing field
+  duration: string; // Added missing field
   imageUrl: string;
   images: string[];
-  owner: {
-    name: string;
-    phone: string;
-    email: string;
-    avatar: string;
-  };
-  isFavorite?: boolean;
-}
-
-export interface SearchFilters {
-  country: string;
-  city: string;
-  minPrice: number;
-  maxPrice: number;
-  type?: PropertyType;
-  furnishing?: Furnishing;
-  duration?: StayDuration;
+  ownerId: string;
+  ownerName: string;
+  owner: PropertyOwner; // Added missing object field
+  isPremium?: boolean;
 }
 
 export interface User {
   id: string;
   name: string;
   email: string;
-  phone: string;
+  role: UserRole;
   avatar: string;
-  role: 'user' | 'admin';
+  balance?: number;
 }
