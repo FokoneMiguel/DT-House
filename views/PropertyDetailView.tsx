@@ -1,13 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ChevronLeft, Heart, Share2, MapPin, 
   MessageCircle, Phone, Sparkles, CheckCircle2,
-  Navigation, Info
+  Navigation, Info, Sofa, Ruler, Bed, Search
 } from 'lucide-react';
 import { Property } from '../types';
-import { getNearbyAmenities } from '../services/gemini';
 
 interface PropertyDetailViewProps {
   properties: Property[];
@@ -19,159 +18,125 @@ const PropertyDetailView: React.FC<PropertyDetailViewProps> = ({ properties, fav
   const { id } = useParams();
   const navigate = useNavigate();
   const property = properties.find(p => p.id === id);
-  
   const [activeImage, setActiveImage] = useState(0);
-  const [amenitiesInfo, setAmenitiesInfo] = useState<{ text: string, sources: any[] } | null>(null);
-  const [isLoadingAmenities, setIsLoadingAmenities] = useState(false);
-
-  useEffect(() => {
-    if (property) {
-      const fetchAmenities = async () => {
-        setIsLoadingAmenities(true);
-        const info = await getNearbyAmenities(property.city);
-        setAmenitiesInfo(info);
-        setIsLoadingAmenities(false);
-      };
-      fetchAmenities();
-    }
-  }, [property]);
 
   if (!property) return <div>Chargement...</div>;
 
   return (
-    <div className="bg-white">
-      <div className="relative">
-        <div className="aspect-[4/3] overflow-hidden">
-          <img src={property.images[activeImage]} alt={property.title} className="w-full h-full object-cover" />
-        </div>
+    <div className="bg-white min-h-screen relative pb-32">
+      {/* Header Image Section */}
+      <div className="relative h-[45vh] overflow-hidden rounded-b-[3.5rem] shadow-2xl">
+        <img src={property.images[activeImage]} alt={property.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20"></div>
         
-        <div className="absolute top-6 left-6 right-6 flex justify-between">
-          <button onClick={() => navigate(-1)} className="p-2 bg-white/80 backdrop-blur rounded-xl shadow-lg">
+        <div className="absolute top-8 left-6 right-6 flex justify-between">
+          <button onClick={() => navigate(-1)} className="p-2.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl text-gray-900">
             <ChevronLeft size={24} />
           </button>
-          <div className="flex gap-2">
-            <button className="p-2 bg-white/80 backdrop-blur rounded-xl shadow-lg">
+          <div className="flex gap-3">
+            <button className="p-2.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl text-gray-900">
               <Share2 size={24} />
             </button>
             <button 
               onClick={() => onToggleFavorite(property.id)}
-              className={`p-2 bg-white/80 backdrop-blur rounded-xl shadow-lg ${favorites.includes(property.id) ? 'text-red-500' : 'text-gray-900'}`}
+              className={`p-2.5 bg-white/90 backdrop-blur rounded-2xl shadow-xl ${favorites.includes(property.id) ? 'text-amber-500' : 'text-gray-900'}`}
             >
               <Heart size={24} fill={favorites.includes(property.id) ? 'currentColor' : 'none'} />
             </button>
           </div>
         </div>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 px-3 py-1.5 bg-black/20 backdrop-blur rounded-full">
-          {property.images.map((_, i) => (
-            <button 
-              key={i} 
-              onClick={() => setActiveImage(i)}
-              className={`w-2 h-2 rounded-full transition-all ${activeImage === i ? 'bg-white w-4' : 'bg-white/50'}`} 
-            />
-          ))}
+        <div className="absolute bottom-10 left-6 right-6 flex justify-between items-end">
+           <div className="flex gap-2">
+             {property.images.map((_, i) => (
+                <div key={i} className={`h-1.5 rounded-full transition-all ${activeImage === i ? 'w-8 bg-white' : 'w-2 bg-white/50'}`} />
+             ))}
+           </div>
+           <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-2xl shadow-xl">
+              <span className="text-xs font-black text-gray-900">{property.type}</span>
+           </div>
         </div>
       </div>
 
-      <div className="px-6 py-8">
-        <div className="flex justify-between items-start mb-6">
+      <div className="px-6 py-10">
+        <div className="flex justify-between items-start mb-8">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{property.title}</h1>
-            <div className="flex items-center gap-1 text-gray-400">
-              <MapPin size={16} />
-              <span className="text-sm font-medium">{property.city}, {property.country}</span>
+            <div className="flex items-center gap-2 text-indigo-600 mb-1">
+               <MapPin size={14} className="fill-current" />
+               <span className="text-[10px] font-black uppercase tracking-widest">{property.neighborhood}</span>
             </div>
+            <h1 className="text-2xl font-black text-gray-900 tracking-tighter leading-tight mb-2">{property.title}</h1>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-black text-indigo-600">{property.price}{property.currency}</p>
-            <p className="text-xs text-gray-400 font-bold uppercase">Par mois</p>
+            <p className="text-2xl font-black text-amber-500">{property.price.toLocaleString()} FCFA</p>
+            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Par mois</p>
           </div>
         </div>
 
-        <div className="flex gap-3 mb-8">
-          <div className="flex-1 bg-gray-50 p-4 rounded-2xl text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Type</p>
-            <p className="text-sm font-bold text-gray-800">{property.type}</p>
+        {/* Feature Grid like the Results view but detailed */}
+        <div className="grid grid-cols-2 gap-3 mb-10">
+          <div className="bg-gray-50 p-5 rounded-[2rem] flex items-center gap-4">
+             <div className="p-3 bg-white rounded-2xl text-indigo-600 shadow-sm"><Bed size={20} /></div>
+             <div>
+               <p className="text-[8px] font-black text-gray-400 uppercase">Pièces</p>
+               <p className="text-sm font-black text-gray-900 tracking-tighter">2 pièces</p>
+             </div>
           </div>
-          <div className="flex-1 bg-gray-50 p-4 rounded-2xl text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Meublé</p>
-            <p className="text-sm font-bold text-gray-800">{property.furnishing}</p>
-          </div>
-          <div className="flex-1 bg-gray-50 p-4 rounded-2xl text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase mb-1">Durée</p>
-            <p className="text-sm font-bold text-gray-800">{property.duration}</p>
+          <div className="bg-gray-50 p-5 rounded-[2rem] flex items-center gap-4">
+             <div className="p-3 bg-white rounded-2xl text-indigo-600 shadow-sm"><Ruler size={20} /></div>
+             <div>
+               <p className="text-[8px] font-black text-gray-400 uppercase">Surface</p>
+               <p className="text-sm font-black text-gray-900 tracking-tighter">55 m²</p>
+             </div>
           </div>
         </div>
 
-        <div className="mb-8">
-          <h3 className="text-lg font-bold mb-4">Description</h3>
-          <p className="text-gray-600 leading-relaxed text-sm">
+        <div className="mb-10">
+          <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-4">Description</h3>
+          <p className="text-gray-500 font-medium leading-relaxed text-sm">
             {property.description}
           </p>
         </div>
 
-        {/* AI Maps Grounding Section */}
-        <div className="mb-10 bg-blue-50/50 rounded-3xl p-6 border border-blue-100">
-          <div className="flex items-center gap-2 mb-4 text-blue-600">
-            <Navigation size={20} className="fill-current" />
-            <h3 className="text-lg font-bold">À proximité (IA Maps)</h3>
-          </div>
-          
-          {isLoadingAmenities ? (
-            <div className="space-y-3 animate-pulse">
-              <div className="h-4 bg-blue-200/30 rounded w-full"></div>
-              <div className="h-4 bg-blue-200/30 rounded w-5/6"></div>
-              <div className="h-4 bg-blue-200/30 rounded w-4/6"></div>
-            </div>
-          ) : amenitiesInfo ? (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {amenitiesInfo.text.split('\n').slice(0, 3).join('\n')}...
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {amenitiesInfo.sources.slice(0, 3).map((source: any, i: number) => (
-                  <a 
-                    key={i}
-                    href={source.maps?.uri}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center gap-1.5 bg-white border border-blue-100 px-3 py-1.5 rounded-full text-[10px] font-bold text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                  >
-                    <Info size={12} />
-                    {source.maps?.title || "Voir sur Maps"}
-                  </a>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500 italic">Informations non disponibles.</p>
-          )}
+        {/* Local Insights Map/Area card */}
+        <div className="bg-gray-900 rounded-[2.5rem] p-8 text-white mb-12 relative overflow-hidden group">
+           <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800" className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:scale-110 transition-transform duration-1000" />
+           <div className="relative z-10">
+              <h4 className="text-lg font-black mb-2 tracking-tight">Vivre à {property.neighborhood}</h4>
+              <p className="text-xs text-gray-400 mb-6 font-medium leading-relaxed">Découvrez les services, transports et commodités de ce quartier premium.</p>
+              <button className="flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-tighter shadow-xl">
+                 <Navigation size={14} className="fill-current" />
+                 Explorer la zone
+              </button>
+           </div>
         </div>
 
         <div className="mb-10">
-          <h3 className="text-lg font-bold mb-6">Propriétaire</h3>
-          <div className="flex items-center gap-4 bg-white border border-gray-100 p-4 rounded-3xl shadow-sm">
-            <img src={property.owner.avatar} alt={property.owner.name} className="w-16 h-16 rounded-2xl object-cover" />
+          <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest mb-6">Propriétaire</h3>
+          <div className="flex items-center gap-4 bg-gray-50 p-4 rounded-[2rem] border border-gray-100">
+            <img src={property.owner.avatar} alt={property.owner.name} className="w-16 h-16 rounded-[1.5rem] object-cover border-4 border-white shadow-lg" />
             <div className="flex-1">
-              <h4 className="font-bold text-gray-900">{property.owner.name}</h4>
+              <h4 className="font-black text-gray-900 tracking-tighter">{property.owner.name}</h4>
               <div className="flex items-center gap-1 text-green-500">
-                <CheckCircle2 size={14} />
-                <span className="text-xs font-semibold">Identité vérifiée</span>
+                <CheckCircle2 size={12} className="fill-current text-white bg-green-500 rounded-full" />
+                <span className="text-[10px] font-bold uppercase tracking-tighter">Bailleur Vérifié</span>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl shadow-inner active:scale-95 transition-transform">
-                <MessageCircle size={24} />
-              </button>
-              <button className="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 active:scale-95 transition-transform">
-                <Phone size={24} />
-              </button>
-            </div>
+            <button className="p-4 bg-white text-indigo-600 rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition-transform">
+              <Phone size={20} />
+            </button>
           </div>
         </div>
+      </div>
 
-        <button className="w-full bg-indigo-600 text-white font-bold py-5 rounded-3xl shadow-xl shadow-indigo-100 sticky bottom-6 hover:bg-indigo-700 active:scale-[0.98] transition-all">
-          Réserver maintenant
+      {/* Floating Contacter Button exactly like the center detail screen */}
+      <div className="fixed bottom-10 left-6 right-6 z-[100]">
+        <button 
+          onClick={() => navigate(`/chat/${property.id}`)}
+          className="w-full bg-amber-500 text-white font-black py-5 rounded-2xl shadow-2xl shadow-amber-200 flex items-center justify-center gap-3 active:scale-95 transition-all uppercase text-sm tracking-widest"
+        >
+          <MessageCircle size={22} strokeWidth={3} />
+          Contacter
         </button>
       </div>
     </div>

@@ -1,118 +1,108 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Globe, Sparkles, PlusCircle } from 'lucide-react';
+import { Search, MapPin, Globe, Sparkles, PlusCircle, Bed, Home, Sofa, LayoutGrid, ChevronLeft } from 'lucide-react';
+import { PropertyType } from '../types';
 
 const HomeView: React.FC = () => {
   const navigate = useNavigate();
-  const [country, setCountry] = useState('France');
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState('Yaoundé');
+  const [budget, setBudget] = useState(120000);
 
   const handleSearch = () => {
-    navigate(`/search?country=${country}&city=${city}`);
+    navigate(`/search?city=${city}&budget=${budget}`);
   };
 
   return (
-    <div className="px-6 py-8 relative">
-      <header className="mb-10 animate-in fade-in slide-in-from-top-4 duration-700 flex justify-between items-start">
-        <div>
-          <p className="text-indigo-600 font-bold text-xs uppercase tracking-widest mb-2">Marketplace Immobilier</p>
-          <h1 className="text-3xl font-black text-gray-900 leading-tight">
-            Votre futur chez-vous <br />
-            <span className="text-indigo-600 underline decoration-indigo-200 decoration-4 underline-offset-4">est ici</span>
-          </h1>
-        </div>
-        <button 
-          onClick={() => navigate('/add-listing')}
-          className="p-3 bg-white rounded-2xl shadow-lg border border-gray-50 text-indigo-600 active:scale-95 transition-all flex flex-col items-center gap-1"
-        >
-          <PlusCircle size={24} />
-          <span className="text-[8px] font-black uppercase">Publier</span>
+    <div className="px-6 py-8 relative bg-white min-h-screen">
+      <header className="flex items-center gap-4 mb-8">
+        <button onClick={() => navigate(-1)} className="p-2 bg-gray-50 rounded-xl text-gray-400">
+          <ChevronLeft size={20} />
         </button>
+        <h1 className="text-xl font-black text-gray-900 tracking-tight">Recherche</h1>
       </header>
 
-      <div className="bg-white p-6 rounded-[2.5rem] shadow-2xl shadow-gray-200 border border-gray-50 space-y-6 relative z-10 animate-in zoom-in-95 duration-500">
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Destination</label>
-          <div className="relative group">
-            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500 transition-transform group-focus-within:scale-110" size={20} />
-            <select 
-              className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl appearance-none font-bold text-gray-800 focus:ring-4 focus:ring-indigo-100 transition-all"
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-            >
-              <option>France</option>
-              <option>Belgique</option>
-              <option>Maroc</option>
-              <option>Canada</option>
-            </select>
-          </div>
-        </div>
+      <div className="mb-10">
+        <h2 className="text-2xl font-black text-gray-900 leading-tight mb-8">
+          Trouver votre <br />logement idéal
+        </h2>
 
-        <div className="space-y-2">
-          <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Ville</label>
-          <div className="relative group">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500 transition-transform group-focus-within:scale-110" size={20} />
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Lieu</label>
+            <div className="relative group">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500 font-bold">🇨🇲</div>
+              <select 
+                className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl appearance-none font-bold text-gray-800 focus:ring-2 focus:ring-indigo-100 transition-all"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              >
+                <option>Yaoundé</option>
+                <option>Douala</option>
+                <option>Kribi</option>
+                <option>Bafoussam</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-center ml-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Budget</label>
+              <span className="text-xs font-black text-gray-600">Jusqu'à {budget.toLocaleString()} FCFA</span>
+            </div>
             <input 
-              type="text" 
-              placeholder="Ex: Paris, Lyon, Casablanca..."
-              className="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl font-bold text-gray-800 placeholder:text-gray-300 focus:ring-4 focus:ring-indigo-100 transition-all"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
+              type="range" 
+              min="50000" 
+              max="2000000" 
+              step="10000"
+              value={budget}
+              onChange={(e) => setBudget(parseInt(e.target.value))}
+              className="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-indigo-600"
             />
           </div>
-        </div>
 
-        <button 
-          onClick={handleSearch}
-          className="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 hover:bg-indigo-700 active:scale-[0.97] transition-all"
-        >
-          <Search size={22} strokeWidth={3} />
-          <span>Trouver un logement</span>
-        </button>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { label: '1+ pièce', icon: <Bed size={16} />, active: true },
+              { label: 'Appartement', icon: <Home size={16} /> },
+              { label: 'Meublé', icon: <Sofa size={16} /> },
+              { label: 'Tout', icon: <LayoutGrid size={16} /> },
+            ].map((filter, i) => (
+              <button 
+                key={i}
+                className={`flex items-center gap-3 p-4 rounded-2xl border transition-all ${filter.active ? 'bg-indigo-50 border-indigo-200 text-indigo-600' : 'bg-gray-50 border-transparent text-gray-400'}`}
+              >
+                {filter.icon}
+                <span className="text-xs font-bold">{filter.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
-      {/* AI Assistant Call to Action */}
-      <div 
-        onClick={() => navigate('/concierge')}
-        className="mt-8 bg-gradient-to-r from-indigo-900 to-indigo-700 p-5 rounded-3xl text-white shadow-lg cursor-pointer flex items-center justify-between hover:scale-[1.02] active:scale-95 transition-all"
+      <button 
+        onClick={handleSearch}
+        className="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl shadow-xl shadow-indigo-100 flex items-center justify-center gap-3 active:scale-[0.97] transition-all"
       >
+        <span>Rechercher</span>
+        <ChevronLeft className="rotate-180" size={18} strokeWidth={3} />
+      </button>
+
+      {/* Quick Access AI Section */}
+      <div className="mt-8 p-6 bg-amber-50 rounded-3xl border border-amber-100 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
-            <Sparkles className="text-white" size={24} />
+          <div className="bg-amber-500 p-3 rounded-2xl text-white shadow-lg shadow-amber-200">
+            <Sparkles size={20} />
           </div>
           <div>
-            <p className="font-black text-sm">Concierge IA Vocal</p>
-            <p className="text-[10px] text-indigo-100 font-medium opacity-80">Trouvez par la voix en 30 secondes</p>
+            <p className="text-xs font-black text-amber-900 uppercase">HOUZ AI</p>
+            <p className="text-[10px] text-amber-700 font-bold opacity-70">Concierge Intelligent</p>
           </div>
         </div>
-        <div className="w-8 h-8 rounded-full border-2 border-white/30 flex items-center justify-center">
-          <div className="w-2 h-2 bg-white rounded-full animate-ping"></div>
-        </div>
+        <button onClick={() => navigate('/ai-lab')} className="bg-white p-2 rounded-xl text-amber-500 shadow-sm">
+          <ChevronLeft className="rotate-180" size={16} strokeWidth={3} />
+        </button>
       </div>
-
-      <section className="mt-12 mb-10">
-        <div className="flex justify-between items-end mb-6">
-          <h2 className="text-xl font-black text-gray-900">Destinations</h2>
-          <button className="text-xs font-bold text-indigo-600 px-3 py-1 bg-indigo-50 rounded-full">Explorer</button>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          {[
-            { name: 'Paris', img: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80', count: '1.2k+' },
-            { name: 'Marrakech', img: 'https://images.unsplash.com/photo-1597212618440-8062a50406b9?w=400&q=80', count: '400+' },
-          ].map((item, idx) => (
-            <div key={idx} className="relative rounded-3xl overflow-hidden aspect-[4/5] group cursor-pointer" onClick={() => navigate(`/search?city=${item.name}`)}>
-              <img src={item.img} alt={item.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent"></div>
-              <div className="absolute bottom-5 left-5 text-white">
-                <p className="font-black text-xl">{item.name}</p>
-                <p className="text-[10px] font-bold opacity-80 tracking-widest uppercase">{item.count} log.</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
     </div>
   );
 };
