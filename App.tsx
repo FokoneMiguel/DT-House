@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
-  Search, Heart, User as UserIcon, Home as HomeIcon, 
+  Heart, User as UserIcon, Home as HomeIcon, 
   MessageSquare, PlusSquare, LayoutDashboard, Wallet,
-  Building2, Sparkles
+  Sparkles
 } from 'lucide-react';
 import { User, UserRole, Property } from './types';
 import { MOCK_HOUSES } from './data/mockHouses';
@@ -22,6 +22,7 @@ import ChatRoomView from './views/ChatRoomView';
 import AddListingView from './views/AddListingView';
 import OwnerDashboardView from './views/OwnerDashboardView';
 import AIEnhanceView from './views/AIEnhanceView';
+import PaymentView from './views/PaymentView';
 
 const App: React.FC = () => {
   const [isAppLoaded, setIsAppLoaded] = useState(false);
@@ -35,9 +36,7 @@ const App: React.FC = () => {
   }, []);
 
   const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
-    );
+    setFavorites(prev => prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]);
   };
 
   const addProperty = (newProp: Property) => {
@@ -52,7 +51,7 @@ const App: React.FC = () => {
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-gray-100">
         <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
           <Routes>
-            <Route path="/" element={user.role === UserRole.OWNER ? <OwnerDashboardView user={user} properties={properties} /> : <HomeView />} />
+            <Route path="/" element={user.role === UserRole.OWNER ? <OwnerDashboardView user={user} properties={properties} /> : <HomeView properties={properties} />} />
             <Route path="/search" element={<ResultsView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
             <Route path="/property/:id" element={<PropertyDetailView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
             <Route path="/favorites" element={<FavoritesView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
@@ -61,6 +60,7 @@ const App: React.FC = () => {
             <Route path="/profile" element={<ProfileView user={user} onLogout={() => setUser(null)} />} />
             <Route path="/add-listing" element={<AddListingView onAdd={addProperty} owner={user} />} />
             <Route path="/ai-lab" element={<AIEnhanceView />} />
+            <Route path="/payment" element={<PaymentView />} />
           </Routes>
         </div>
         <BottomNav role={user.role} />
@@ -75,10 +75,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const NavButton = ({ path, icon: Icon, label }: any) => (
-    <button 
-      onClick={() => navigate(path)} 
-      className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-indigo-600 scale-110' : 'text-gray-400 hover:text-gray-600'}`}
-    >
+    <button onClick={() => navigate(path)} className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-indigo-600 scale-110' : 'text-gray-400'}`}>
       <Icon size={24} strokeWidth={isActive(path) ? 2.5 : 2} />
       <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
     </button>
@@ -90,10 +87,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
         <>
           <NavButton path="/" icon={HomeIcon} label="HOUZ" />
           <NavButton path="/favorites" icon={Heart} label="Favoris" />
-          <button 
-            onClick={() => navigate('/ai-lab')}
-            className="bg-indigo-600 p-4 rounded-2xl -mt-12 shadow-xl shadow-indigo-200 text-white transform active:scale-90 transition-all"
-          >
+          <button onClick={() => navigate('/ai-lab')} className="bg-indigo-600 p-4 rounded-2xl -mt-12 shadow-xl shadow-indigo-200 text-white transform active:scale-90 transition-all">
             <Sparkles size={24} />
           </button>
           <NavButton path="/messages" icon={MessageSquare} label="Chats" />
@@ -103,9 +97,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
         <>
           <NavButton path="/" icon={LayoutDashboard} label="Bord" />
           <NavButton path="/add-listing" icon={PlusSquare} label="Publier" />
-          <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-2xl -mt-12 shadow-xl shadow-amber-100 text-white">
-            <Wallet size={24} />
-          </div>
+          <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-2xl -mt-12 shadow-xl shadow-amber-100 text-white"><Wallet size={24} /></div>
           <NavButton path="/messages" icon={MessageSquare} label="Chats" />
           <NavButton path="/profile" icon={UserIcon} label="Profil" />
         </>

@@ -7,20 +7,45 @@ export enum PropertyType {
   VILLA = 'Villa'
 }
 
-// Fix missing enums needed for Property interface and AddListingView
+export enum UserRole {
+  TENANT = 'Locataire',
+  OWNER = 'Propriétaire'
+}
+
+export enum PaymentMethod {
+  MTN_MOMO = 'MTN Mobile Money',
+  ORANGE_MONEY = 'Orange Money'
+}
+
+// Fix: Added missing Furnishing enum
 export enum Furnishing {
   MEUBLE = 'Meublé',
   NON_MEUBLE = 'Non meublé'
 }
 
+// Fix: Added missing StayDuration enum
 export enum StayDuration {
   SHORT = 'Court séjour',
   LONG = 'Long séjour'
 }
 
-export enum UserRole {
-  TENANT = 'Locataire',
-  OWNER = 'Propriétaire'
+export interface UserLocation {
+  lat: number;
+  lng: number;
+  address?: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar: string;
+  dob?: string;
+  location?: UserLocation;
+  isVerified: boolean;
+  cniUrl?: string;
+  balance?: number;
 }
 
 export interface Message {
@@ -28,31 +53,14 @@ export interface Message {
   senderId: string;
   text: string;
   timestamp: number;
+  propertyId?: string; // Contextuel
 }
 
 export interface Chat {
   id: string;
   participants: string[];
   propertyId: string;
-  lastMessage?: string;
   messages: Message[];
-}
-
-export interface Transaction {
-  id: string;
-  propertyId: string;
-  amount: number;
-  commission: number;
-  status: 'pending' | 'completed';
-  date: number;
-}
-
-// New interface for owner details in property context
-export interface PropertyOwner {
-  name: string;
-  avatar: string;
-  phone?: string;
-  email?: string;
 }
 
 export interface Property {
@@ -62,24 +70,25 @@ export interface Property {
   price: number;
   currency: string;
   city: string;
-  country: string; // Added missing field
+  // Fix: Added missing country property
+  country: string;
   neighborhood: string;
   type: PropertyType;
-  furnishing: string; // Added missing field
-  duration: string; // Added missing field
+  // Fix: Added missing furnishing and duration properties
+  furnishing?: Furnishing;
+  duration?: StayDuration;
   imageUrl: string;
   images: string[];
   ownerId: string;
   ownerName: string;
-  owner: PropertyOwner; // Added missing object field
+  ownerAvatar?: string;
+  // Fix: Added owner object definition used in mock data and property creation
+  owner?: {
+    name: string;
+    avatar?: string;
+    phone?: string;
+    email?: string;
+  };
+  // Fix: Added isPremium property
   isPremium?: boolean;
-}
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar: string;
-  balance?: number;
 }

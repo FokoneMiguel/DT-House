@@ -1,6 +1,6 @@
 {
-  "name": "ImmoDirect - Housing Marketplace",
-  "description": "A high-fidelity mobile-first real estate marketplace with AI-powered search, image generation, and property analysis.",
+  "name": "HOUZ Cameroun",
+  "description": "Marché immobilier sécurisé avec vérification CNI et paiements mobiles MTN/Orange.",
   "requestFramePermissions": [
     "camera",
     "geolocation"
