@@ -21,6 +21,7 @@ import ChatRoomView from './views/ChatRoomView';
 import AddListingView from './views/AddListingView';
 import OwnerDashboardView from './views/OwnerDashboardView';
 import PaymentView from './views/PaymentView';
+import SettingsView from './views/SettingsView';
 
 const syncChannel = new BroadcastChannel('houz_realtime_sync');
 
@@ -36,13 +37,11 @@ const App: React.FC = () => {
     return saved ? JSON.parse(saved) : MOCK_HOUSES;
   });
 
-  // Persistance de l'utilisateur
   useEffect(() => {
     if (user) localStorage.setItem('houz_user', JSON.stringify(user));
     else localStorage.removeItem('houz_user');
   }, [user]);
 
-  // Sauvegarde et Sync des propriétés
   useEffect(() => {
     localStorage.setItem('houz_properties', JSON.stringify(properties));
     syncChannel.postMessage({ type: 'UPDATE_PROPERTIES', data: properties });
@@ -89,6 +88,7 @@ const App: React.FC = () => {
             <Route path="/messages" element={<MessageCenterView user={user} />} />
             <Route path="/chat/:id" element={<ChatRoomView user={user} />} />
             <Route path="/profile" element={<ProfileView user={user} onUpdateUser={setUser} onLogout={() => setUser(null)} />} />
+            <Route path="/settings" element={<SettingsView user={user} onUpdateUser={setUser} onLogout={() => setUser(null)} />} />
             <Route path="/add-listing" element={<AddListingView onAdd={addProperty} owner={user} />} />
             <Route path="/payment" element={<PaymentView />} />
           </Routes>
@@ -105,7 +105,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const NavButton = ({ path, icon: Icon, label }: any) => (
-    <button onClick={() => navigate(path)} className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-[#0056b3] scale-110' : 'text-gray-300'}`}>
+    <button onClick={() => navigate(path)} className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-brand-blue scale-110' : 'text-gray-300'}`}>
       <Icon size={24} strokeWidth={isActive(path) ? 2.5 : 2} />
       <span className="text-[9px] font-black uppercase tracking-tighter">{label}</span>
     </button>

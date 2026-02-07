@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Property, User, UserRole } from '../types';
+import { Property, User, UserRole, VerificationStatus } from '../types';
 import { Wallet, TrendingUp, Users, Building2, ChevronRight, PlusCircle, ArrowUpRight, Lock, EyeOff, Eye } from 'lucide-react';
 
 interface OwnerDashboardViewProps {
@@ -31,7 +31,8 @@ const OwnerDashboardView: React.FC<OwnerDashboardViewProps> = ({ user, propertie
       </header>
 
       {/* KYC Alert if not verified */}
-      {!user.isVerified && (
+      {/* Fix: Check verificationStatus instead of non-existent isVerified property */}
+      {user.verificationStatus !== VerificationStatus.VERIFIED && (
         <div className="bg-red-50 border border-red-100 p-6 rounded-[2rem] mb-8 flex flex-col gap-4">
           <div className="flex items-center gap-3 text-red-600">
              <Lock size={24} />
@@ -65,8 +66,9 @@ const OwnerDashboardView: React.FC<OwnerDashboardViewProps> = ({ user, propertie
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-black text-gray-900">Mes Annonces</h3>
           <button 
-            onClick={() => user.isVerified ? navigate('/add-listing') : alert('Vérifiez votre compte d\'abord !')}
-            className={`flex items-center gap-1 font-black text-xs uppercase ${user.isVerified ? 'text-blue-600' : 'text-gray-300'}`}
+            // Fix: Check verificationStatus instead of non-existent isVerified property
+            onClick={() => user.verificationStatus === VerificationStatus.VERIFIED ? navigate('/add-listing') : alert('Vérifiez votre compte d\'abord !')}
+            className={`flex items-center gap-1 font-black text-xs uppercase ${user.verificationStatus === VerificationStatus.VERIFIED ? 'text-blue-600' : 'text-gray-300'}`}
           >
             <PlusCircle size={16} /> Ajouter
           </button>
