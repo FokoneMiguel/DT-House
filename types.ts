@@ -34,11 +34,13 @@ export interface User {
   email: string;
   role: UserRole;
   avatar: string;
-  dob?: string;
-  location?: UserLocation;
   isVerified: boolean;
-  cniUrl?: string;
-  balance?: number;
+  kycDetails?: {
+    cniUrl?: string;
+    faceUrl?: string;
+    residenceAddress?: string;
+  };
+  location?: UserLocation;
 }
 
 export interface Property {
@@ -58,11 +60,5 @@ export interface Property {
   ownerId: string;
   ownerName: string;
   ownerAvatar?: string;
-  owner?: {
-    name: string;
-    avatar?: string;
-    phone?: string;
-    email?: string;
-  };
-  isPremium?: boolean;
+  isRented: boolean; // Nouveau: Pour gérer la disponibilité
 }

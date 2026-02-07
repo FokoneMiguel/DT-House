@@ -70,7 +70,7 @@ const AddListingView: React.FC<AddListingViewProps> = ({ onAdd, owner }) => {
 
     setIsSubmitting(true);
     
-    // Updated property creation to match interface requirements
+    // Fixed: Updated property creation to match Property interface exactly
     const newProperty: Property = {
       id: Date.now().toString(),
       title,
@@ -87,12 +87,8 @@ const AddListingView: React.FC<AddListingViewProps> = ({ onAdd, owner }) => {
       images: images,
       ownerId: owner.id,
       ownerName: owner.name,
-      owner: {
-        name: owner.name,
-        phone: '+33 6 00 00 00 00',
-        email: owner.email,
-        avatar: owner.avatar
-      }
+      ownerAvatar: owner.avatar,
+      isRented: false
     };
 
     setTimeout(() => {

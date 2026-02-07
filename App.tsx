@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Heart, User as UserIcon, Home as HomeIcon, 
   MessageSquare, PlusSquare, LayoutDashboard, Wallet,
-  Sparkles
+  Sparkles, Search as SearchIcon
 } from 'lucide-react';
 import { User, UserRole, Property } from './types';
 import { MOCK_HOUSES } from './data/mockHouses';
@@ -24,15 +24,37 @@ import OwnerDashboardView from './views/OwnerDashboardView';
 import AIEnhanceView from './views/AIEnhanceView';
 import PaymentView from './views/PaymentView';
 
+// Simulation Temps Réel entre les navigateurs/onglets
+const syncChannel = new BroadcastChannel('houz_realtime_sync');
+
 const App: React.FC = () => {
   const [isAppLoaded, setIsAppLoaded] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [favorites, setFavorites] = useState<string[]>([]);
-  const [properties, setProperties] = useState<Property[]>(MOCK_HOUSES);
+  const [properties, setProperties] = useState<Property[]>(() => {
+    const saved = localStorage.getItem('houz_properties');
+    return saved ? JSON.parse(saved) : MOCK_HOUSES;
+  });
+
+  // Sauvegarde persistante et synchronisation
+  useEffect(() => {
+    localStorage.setItem('houz_properties', JSON.stringify(properties));
+    syncChannel.postMessage({ type: 'UPDATE_PROPERTIES', data: properties });
+  }, [properties]);
 
   useEffect(() => {
+    const handleSync = (event: MessageEvent) => {
+      if (event.data.type === 'UPDATE_PROPERTIES') {
+        setProperties(event.data.data);
+      }
+    };
+    syncChannel.addEventListener('message', handleSync);
+    
     const timer = setTimeout(() => setIsAppLoaded(true), 2000);
-    return () => clearTimeout(timer);
+    return () => {
+      syncChannel.removeEventListener('message', handleSync);
+      clearTimeout(timer);
+    };
   }, []);
 
   const toggleFavorite = (id: string) => {
@@ -43,6 +65,10 @@ const App: React.FC = () => {
     setProperties(prev => [newProp, ...prev]);
   };
 
+  const updateProperty = (updatedProp: Property) => {
+    setProperties(prev => prev.map(p => p.id === updatedProp.id ? updatedProp : p));
+  };
+
   if (!isAppLoaded) return <SplashScreen />;
   if (!user) return <AuthScreen onLogin={setUser} />;
 
@@ -51,9 +77,9 @@ const App: React.FC = () => {
       <div className="flex flex-col min-h-screen bg-white max-w-md mx-auto relative shadow-2xl overflow-hidden border-x border-gray-100">
         <div className="flex-1 overflow-y-auto hide-scrollbar pb-24">
           <Routes>
-            <Route path="/" element={user.role === UserRole.OWNER ? <OwnerDashboardView user={user} properties={properties} /> : <HomeView properties={properties} />} />
+            <Route path="/" element={user.role === UserRole.OWNER ? <OwnerDashboardView user={user} properties={properties} onUpdateProperty={updateProperty} /> : <HomeView properties={properties} />} />
             <Route path="/search" element={<ResultsView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
-            <Route path="/property/:id" element={<PropertyDetailView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
+            <Route path="/property/:id" element={<PropertyDetailView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} user={user} />} />
             <Route path="/favorites" element={<FavoritesView properties={properties} favorites={favorites} onToggleFavorite={toggleFavorite} />} />
             <Route path="/messages" element={<MessageCenterView user={user} />} />
             <Route path="/chat/:id" element={<ChatRoomView user={user} />} />
@@ -75,7 +101,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
   const isActive = (path: string) => location.pathname === path;
 
   const NavButton = ({ path, icon: Icon, label }: any) => (
-    <button onClick={() => navigate(path)} className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-indigo-600 scale-110' : 'text-gray-400'}`}>
+    <button onClick={() => navigate(path)} className={`flex flex-col items-center gap-1 transition-all ${isActive(path) ? 'text-blue-600 scale-110' : 'text-gray-300'}`}>
       <Icon size={24} strokeWidth={isActive(path) ? 2.5 : 2} />
       <span className="text-[10px] font-bold uppercase tracking-tighter">{label}</span>
     </button>
@@ -85,11 +111,9 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
     <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 px-8 py-4 flex justify-between items-center max-w-md mx-auto z-[100] shadow-2xl">
       {role === UserRole.TENANT ? (
         <>
-          <NavButton path="/" icon={HomeIcon} label="HOUZ" />
+          <NavButton path="/" icon={SearchIcon} label="Recherche" />
           <NavButton path="/favorites" icon={Heart} label="Favoris" />
-          <button onClick={() => navigate('/ai-lab')} className="bg-indigo-600 p-4 rounded-2xl -mt-12 shadow-xl shadow-indigo-200 text-white transform active:scale-90 transition-all">
-            <Sparkles size={24} />
-          </button>
+          <div className="w-10"></div>
           <NavButton path="/messages" icon={MessageSquare} label="Chats" />
           <NavButton path="/profile" icon={UserIcon} label="Profil" />
         </>
@@ -97,7 +121,7 @@ const BottomNav: React.FC<{ role: UserRole }> = ({ role }) => {
         <>
           <NavButton path="/" icon={LayoutDashboard} label="Bord" />
           <NavButton path="/add-listing" icon={PlusSquare} label="Publier" />
-          <div className="w-12 h-12 flex items-center justify-center bg-amber-500 rounded-2xl -mt-12 shadow-xl shadow-amber-100 text-white"><Wallet size={24} /></div>
+          <div className="w-10"></div>
           <NavButton path="/messages" icon={MessageSquare} label="Chats" />
           <NavButton path="/profile" icon={UserIcon} label="Profil" />
         </>
