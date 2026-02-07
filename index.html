@@ -4,19 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HOUZ - Location Immobilier Cameroun</title>
+    <title>L'Agent Immobilier - Location Sécurisée au Cameroun</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
+              brand: {
+                blue: '#1b3a5d',
+                orange: '#f47321',
+                dark: '#112b4d'
+              },
               indigo: {
-                900: '#1a1c3d',
-                600: '#4f46e5'
+                900: '#1b3a5d',
+                600: '#1b3a5d'
               },
               amber: {
-                500: '#f59e0b'
+                500: '#f47321'
               }
             }
           }
@@ -32,6 +37,10 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         #root { min-height: 100vh; }
+        
+        /* Smooth transitions */
+        .page-enter { opacity: 0; transform: translateY(10px); }
+        .page-enter-active { opacity: 1; transform: translateY(0); transition: all 400ms ease-out; }
     </style>
 <script type="importmap">
 {

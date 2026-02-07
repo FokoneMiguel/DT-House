@@ -1,19 +1,21 @@
 
 import React from 'react';
-import { Home } from 'lucide-react';
+import Logo from '../components/Logo';
 
 const SplashScreen: React.FC = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-indigo-600 text-white animate-pulse">
-      <div className="bg-white p-4 rounded-3xl shadow-2xl mb-6">
-        <Home size={64} className="text-indigo-600" />
+    <div className="flex flex-col items-center justify-center h-screen bg-white">
+      <div className="animate-in zoom-in duration-700 ease-out">
+        <Logo className="w-56 h-auto" />
       </div>
-      <h1 className="text-4xl font-bold tracking-tight">ImmoDirect</h1>
-      <p className="mt-2 text-indigo-100 font-medium">Votre futur chez-vous est ici</p>
       
-      <div className="absolute bottom-12 flex flex-col items-center gap-2">
-        <div className="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-        <span className="text-sm font-medium opacity-80">Chargement...</span>
+      <div className="absolute bottom-16 flex flex-col items-center gap-4">
+        <div className="flex gap-1.5">
+          <div className="w-2 h-2 bg-brand-blue rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+          <div className="w-2 h-2 bg-brand-orange rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+          <div className="w-2 h-2 bg-brand-blue rounded-full animate-bounce"></div>
+        </div>
+        <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">HOUZ Cameroun</span>
       </div>
     </div>
   );
